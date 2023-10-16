@@ -5,15 +5,15 @@ A black-jack implementation in Python.
 Using:
 + Pygame
 """
-
 import pygame
+import random
 import sys
-# import module for typing
+import time
 from typing import List, Tuple
 
 
 
-def CalculateHandValue(hand : list) -> int:
+def CalculateHandValue(hand : list) -> int: # O(n) - no loops just recursion over the list
     """Calculate the value of the hand.
     Args:
         hand (list): list of cards [where a card is a tuple of (suit, value)]
@@ -40,6 +40,26 @@ def CalculateHandValue(hand : list) -> int:
             return handFilter + CalculateHandValue(hand[1:])
     else:
         return hand[0][0] + CalculateHandValue(hand[1:])
+
+def ShuffleDeck(deck: list) -> list: # O(n)
+    """Shuffle the deck.
+    Args:
+        deck (list): list of cards
+    Returns:
+        list: shuffled deck
+    """
+    # this algorithm is called Fisher-Yates shuffle
+    # https://en.wikipedia.org/wiki/Fisher%E2%80%93Yates_shuffle
+
+    n = len(deck)
+    while n > 1: # O(n)
+        n -= 1
+        k = random.randint(0, n) # we take some random item j
+        deck[k], deck[n] = deck[n], deck[k] # we just swap the last index with the random index
+        # where the last index moves closer to the beginning of the list
+    return deck
+
+
 
 
 def main():

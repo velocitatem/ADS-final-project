@@ -1,7 +1,7 @@
 """
 IN this file we will write our tests
 """
-from main import CalculateHandValue
+from main import CalculateHandValue, ShuffleDeck
 import unittest as ut
 
 class BlackJack(ut.TestCase):
@@ -16,6 +16,11 @@ class BlackJack(ut.TestCase):
         # what if we have a hand with 2 aces?
         hand = [('A', 'H'), ('A', 'C'), (4, 'D'), (9, 'D')]
         self.assertEqual(CalculateHandValue(hand), 15) # 1 + 1 + 4 + 9 = 15
+
+    def random_shuffle(self):
+        testDeck = [('A', 'H'), ('A', 'C'), (4, 'D'), (9, 'D'), (8, 'C'), ('J', 'H')]
+        decks = [ShuffleDeck(testDeck) for _ in range(3)]
+        self.assertTrue(allDifferent)
 
 
 if __name__ == '__main__':
