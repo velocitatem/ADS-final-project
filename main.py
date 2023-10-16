@@ -24,16 +24,22 @@ def CalculateHandValue(hand : list) -> int:
     https://entertainment.howstuffworks.com/blackjack2.htm
     """
     legend = {
-        'A': 11,
+        'A': lambda x: 11 if x + 11 <= 21 else 1, # we need to see if we should use a soft ace or a hard ace
+        # gotta love lambda functions :)
         'J': 10,
         'Q': 10,
         }
     if hand == []:
         return 0
-    if hand[0] in legend:
-        return legend[hand[0]] + CalculateHandValue(hand[1:])
+    if hand[0][0] in legend:
+        handFilter = legend[hand[0][0]]
+        if callable(handFilter):
+            # pylint: disable=line-too-long
+            return handFilter(CalculateHandValue(hand[1:])) + CalculateHandValue(hand[1:])
+        else:
+            return handFilter + CalculateHandValue(hand[1:])
     else:
-        return int(hand[0]) + CalculateHandValue(hand[1:])
+        return hand[0][0] + CalculateHandValue(hand[1:])
 
 
 def main():
