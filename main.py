@@ -8,10 +8,25 @@ import random
 import sys
 import time
 from typing import List, Tuple
+from functools import lru_cache
 
 
 
-def CalculateHandValue(hand : list) -> int: # O(n) - no loops just recursion over the list
+
+def CalculateHandValue(hand : list) -> int: # O(n)
+    """Calculate the value of the hand.
+    Args:
+        hand (list): list of cards [where a card is a tuple of (suit, value)]
+    Returns:
+        int: value of the hand
+    This is a simple adapter function that converts the list to a tuple.
+    """
+    return CalculateHandValueR(tuple(hand))
+
+
+
+@lru_cache(maxsize=128)
+def CalculateHandValueR(hand : tuple) -> int: # O(n) - no loops just recursion over the list
     """Calculate the value of the hand.
     Args:
         hand (list): list of cards [where a card is a tuple of (suit, value)]
@@ -19,6 +34,7 @@ def CalculateHandValue(hand : list) -> int: # O(n) - no loops just recursion ove
         int: value of the hand
     Process:
     Number cards have a value equal to their number, while all the picture cards (Jacks, Queens, and Kings) are worth 10. Aces can be worth 11 or one, whichever is more beneficial to the person holding the hand. For example, a hand with an Ace and an Eight is worth 19 (the Ace is valued at 11, known as a soft Ace). A hand with an Ace, a Four, and a Nine is worth 14 (the Ace is valued at one, known as a hard Ace, because if it were valued at 11 the hand would bust).
+    We are making use of recursion.
     https://entertainment.howstuffworks.com/blackjack2.htm
     """
     legend = {
@@ -28,7 +44,7 @@ def CalculateHandValue(hand : list) -> int: # O(n) - no loops just recursion ove
         'Q': 10,
         'K': 10,
         }
-    if hand == []:
+    if hand == ():
         return 0
     if hand[0][0] in legend:
         handFilter = legend[hand[0][0]]
@@ -65,9 +81,12 @@ def DealCard(deck: list) -> Tuple[str, int]: # O(1)
     Returns:
         tuple: card
     """
-    return deck.pop()
+    # also add to the seen cards
+    card = deck.pop()
+    seen_cards.add(card)
+    return card
 
-def DealHand(deck: list) -> List[Tuple[str, int]]: # O(1)
+def DealHand(deck: list) -> List[Tuple[str, int]]: # O(2) ~ O(1)
     """Deal a hand from the deck.
     Args:
         deck (list): list of cards
@@ -93,6 +112,7 @@ def PrettyPrintCard(card: Tuple[str, int]) -> str: # O(1)
     # TODO Make a verbose function that gives use the full name of the card
     print(f'{symbol[card[1]]} {card[0]}')
 
+seen_cards = set()
 def main():
     pygame.init()
     pygame.display.set_caption('Black Jack')
@@ -136,19 +156,36 @@ def winner(playerHand: list, dealerHand: list) -> str:
     else:
         return 'Tie'
 
+
 def DealerAI(dealerHand: list) -> bool:
     """A Simple algorithm to determine if the dealer should hit or stand.
     Args:
         dealerHand (list): dealer's hand
     Returns:
         bool: True = hit, False = stand
-    1. If the dealer's hand is less than 17, the dealer must hit.
-    2. If the dealer's hand is greater than or equal to 17, the dealer must stand.
+    This algorithm is a card-counter algorithm, based on the predicted probability it will hit or stand.
     """
-    if CalculateHandValue(dealerHand) < 17:
-        return True
-    else:
-        return False
+
+    # using cached valur
+    left = 21 - CalculateHandValue(dealerHand)
+    # assume full deck
+    # calculate number of cards that wont bust
+    count = 0
+    for card in seen_cards:
+        if CalculateHandValueR(tuple([card] + dealerHand)) <= 21:
+            count += 1
+    # calculate probability
+    probability = count / len(seen_cards)
+    # if probability is greater than 50% hit
+
+
+    return probability > 0.5
+
+
+
+
+
+
 
 def main_cli():
     """
@@ -163,6 +200,9 @@ def main_cli():
 
     playerHand = DealHand(deck)
     dealerHand = DealHand(deck)
+    # remove one of them from the deck
+    # one of them has to be face down
+    seen_cards.remove(dealerHand[0])
 
     # this is all from the perspective of the player
     print('Your hand is:')
@@ -174,11 +214,19 @@ def main_cli():
     PrettyPrintCard(dealerHand[0])
     print('The dealer\'s second card is face down.')
 
+
     while True:
         print('Do you want to hit or stand?')
         print('1. Hit')
         print('2. Stand')
+        print('3. Quit')
         choice = input('Enter your choice: ')
+
+
+        if choice == '3':
+
+            break
+
 
         if choice == '1':
             playerHand.append(DealCard(deck))
@@ -190,19 +238,23 @@ def main_cli():
                 print('You busted!')
                 break
         elif choice == '2':
-            # let the dealer play
-            while DealerAI(dealerHand):
-                dealerHand.append(DealCard(deck))
+            pass
+        if DealerAI(dealerHand):
+            dealerHand.append(DealCard(deck))
             print('The dealer\'s hand is:')
             for card in dealerHand:
                 PrettyPrintCard(card)
             print('Value of the dealer\'s hand:', CalculateHandValue(dealerHand))
-            break
+            if CalculateHandValue(dealerHand) > 21:
+                print('The dealer busted!')
+                break
 
         if CalculateHandValue(playerHand) == 21:
             print('You got a blackjack!')
             break
 
+
+    print('The winner is:', winner(playerHand, dealerHand))
 
 
 main_cli()
