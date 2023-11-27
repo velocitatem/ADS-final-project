@@ -11,6 +11,7 @@ from typing import List, Tuple
 from functools import lru_cache
 
 
+deck = None
 
 
 def CalculateHandValue(hand : list) -> int: # O(n)
@@ -157,6 +158,38 @@ def winner(playerHand: list, dealerHand: list) -> str:
         return 'Tie'
 
 
+
+import heapq
+def ideal_cards(handValue):
+    """This function returns the ideal cards in a heap in order to win the game.
+    Args:
+        handValue (int): hand value
+    Returns:
+        list: ideal cards
+    An ideal card is a card that will get the player closer to 21 but not over 21.
+    WE can do this by getting the absolute value of the difference between the hand value and the card value.
+    Then we can get the top 3 cards.
+    """
+    heap = []
+    for card in deck:
+        card_index = deck.index(card)
+        heapq.heappush(heap, (card_index, abs(handValue - CalculateHandValue([card]))))
+    ideal = heapq.nsmallest(3, heap)
+    ideal = [(deck[i[0]], i[1]) for i in ideal]
+
+    return ideal
+
+def probability_of_card(card: Tuple[str, int]) -> float:
+    """Calculate the probability of a card.
+    Args:
+        card (tuple): card
+    Returns:
+        float: probability of the card
+    """
+    # check if the card is in the seen cards
+
+
+
 def DealerAI(dealerHand: list) -> bool:
     """A Simple algorithm to determine if the dealer should hit or stand.
     Args:
@@ -167,27 +200,19 @@ def DealerAI(dealerHand: list) -> bool:
     """
 
     # using cached valur
-    left = 21 - CalculateHandValue(dealerHand)
-    # assume full deck
-    # calculate number of cards that wont bust
-    count = 0
-    for card in seen_cards:
-        if CalculateHandValueR(tuple([card] + dealerHand)) <= 21:
-            count += 1
-    # calculate probability
-    probability = count / len(seen_cards)
-    # if probability is greater than 50% hit
-
-
-    return probability > 0.5
-
-
-
-
-
-
+    dealerHandValue = CalculateHandValue(dealerHand)
+    left = 21 - dealerHandValue
+    ideal = ideal_cards(dealerHandValue)
+    print(ideal)
+    # we need to check the probability of the card
+    prob = probability_of_card(ideal[0][1])
+    if prob >= 0.5:
+        return True
+    else:
+        return False
 
 def main_cli():
+    global deck
     """
     1. The dealer gives each player two cards including himself.
     2. The dealer has one card face up and one card face down.
