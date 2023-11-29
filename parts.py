@@ -1,6 +1,9 @@
 import random
 from typing import Tuple, List
+
+
 def ShuffleDeck(deck: list) -> list: # O(n)
+
     """Shuffle the deck.
     Args:
         deck (list): list of cards
@@ -18,28 +21,34 @@ def ShuffleDeck(deck: list) -> list: # O(n)
         # where the last index moves closer to the beginning of the list
     return deck
 
-def DealCard(deck: list, seen_cards : list) -> Tuple[str, int]: # O(1)
+
+def DealCard(game) -> Tuple[str, int]: # O(1)
+
     """Deal a card from the deck.
     Args:
-        deck (list): list of cards
+        game (GameState): game state
     Returns:
         tuple: card
     """
     # also add to the seen cards
-    card = deck.pop()
-    seen_cards.add(card)
+    card = game.deck.pop()
+    game.seen_cards.add(card)
     return card
 
-def DealHand(deck: list) -> List[Tuple[str, int]]: # O(2) ~ O(1)
+
+def DealHand(game) -> List[Tuple[str, int]]: # O(2) ~ O(1)
+
     """Deal a hand from the deck.
     Args:
-        deck (list): list of cards
+        game (GameState): game state
     Returns:
         list: hand
     """
-    return [DealCard(deck) for _ in range(2)]
+    return [DealCard(game) for _ in range(2)]
+
 
 def PrettyPrintCard(card: Tuple[str, int]) -> str: # O(1)
+
     """Pretty print a card.
     Args:
         card (tuple): card

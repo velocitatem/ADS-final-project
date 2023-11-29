@@ -1,17 +1,22 @@
 from functools import lru_cache
-from game_state import GameState
 from typing import Tuple
-
 import heapq
+
+
 @lru_cache(maxsize=128)
 def CalculateHandValue(hand : tuple) -> int: # O(n) - no loops just recursion over the list
+
     """Calculate the value of the hand.
     Args:
         hand (list): list of cards [where a card is a tuple of (suit, value)]
     Returns:
         int: value of the hand
     Process:
-    Number cards have a value equal to their number, while all the picture cards (Jacks, Queens, and Kings) are worth 10. Aces can be worth 11 or one, whichever is more beneficial to the person holding the hand. For example, a hand with an Ace and an Eight is worth 19 (the Ace is valued at 11, known as a soft Ace). A hand with an Ace, a Four, and a Nine is worth 14 (the Ace is valued at one, known as a hard Ace, because if it were valued at 11 the hand would bust).
+    Number cards have a value equal to their number, while all the picture cards (Jacks, Queens, and Kings) are worth
+    10. Aces can be worth 11 or one, whichever is more beneficial to the person holding the hand. For example, a hand
+    with an Ace and an Eight is worth 19 (the Ace is valued at 11, known as a soft Ace). A hand with an Ace, a Four,
+    and a Nine is worth 14 (the Ace is valued at one, known as a hard Ace, because if it were valued at 11 the hand
+    would bust).
     We are making use of recursion.
     https://entertainment.howstuffworks.com/blackjack2.htm
     """
@@ -36,6 +41,7 @@ def CalculateHandValue(hand : tuple) -> int: # O(n) - no loops just recursion ov
 
 
 def GetIdealCards(handValue : int, deck : list):
+
     """This function returns the ideal cards in a heap in order to win the game.
     Args:
         handValue (int): hand value
@@ -57,7 +63,9 @@ def GetIdealCards(handValue : int, deck : list):
 
     return ideal
 
-def ProbabilityOfCard(card: Tuple[str, int], game : GameState) -> float:
+
+def ProbabilityOfCard(card: Tuple[str, int], game) -> float:
+
     """Calculate the probability of a card.
     Args:
         card (tuple): card
@@ -71,3 +79,14 @@ def ProbabilityOfCard(card: Tuple[str, int], game : GameState) -> float:
     if card in game.deck:
         return 1 / len(game.deck)
     # if not then return 0
+
+
+def GenerateCards() -> list:
+
+    """Generates a list of cards.
+    Returns:
+        list: list of cards
+    """
+    return [(value, suit) for suit in ['S', 'H', 'D', 'C'] for value in range(2, 11)] + [(value, suit) for suit in
+                                                                                  ['S', 'H', 'D', 'C'] for value in
+                                                                                  ['J', 'Q', 'K', 'A']]
