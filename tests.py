@@ -1,8 +1,13 @@
 """
 IN this file we will write our tests
 """
-from main import CalculateHandValue, ShuffleDeck
+from game_core import CalculateHandValue
+from parts import ShuffleDeck
+from game_core import DealerAI
+from game_state import GameState, Players
 import unittest as ut
+from game_state import AIMODE
+
 
 class BlackJack(ut.TestCase):
 
@@ -17,10 +22,58 @@ class BlackJack(ut.TestCase):
         hand = [('A', 'H'), ('A', 'C'), (4, 'D'), (9, 'D')]
         self.assertEqual(CalculateHandValue(hand), 15) # 1 + 1 + 4 + 9 = 15
 
-    def random_shuffle(self):
+    def test_random_shuffle(self):
         testDeck = [('A', 'H'), ('A', 'C'), (4, 'D'), (9, 'D'), (8, 'C'), ('J', 'H')]
-        decks = [ShuffleDeck(testDeck) for _ in range(3)]
-        self.assertTrue(allDifferent)
+        decks = [ShuffleDeck(
+            testDeck.copy()
+        ) for _ in range(3)]
+        # test if the decks are different
+        self.assertNotEqual(decks[0], decks[1])
+        self.assertNotEqual(decks[1], decks[2])
+        self.assertNotEqual(decks[0], decks[2])
+
+
+    def dealer(self, mode):
+
+        missess = 0
+        avg_proximity = 0
+        busts = 0
+        # simulate games, dealer should not bust
+        for case in range(100):
+            game = GameState(mode)
+            # dealt by default
+            # play until dealer stands
+            # compare dealer choice to reality
+            # if dealer stands, dealer should not bust
+            while DealerAI(game.copy()):
+                game.dealCard(Players.DEALER)
+            # see if dealer chould have gone farther
+            if game.handValue(Players.DEALER) > 21:
+                busts += 1
+            next = game.deck[0]
+            print(next, game.handValue(Players.DEALER))
+            # would the dealer have busted?
+            could_have_continued = False
+            if game.handValue(Players.DEALER) + CalculateHandValue([next]) > 21:
+                could_have_continued = True
+            if could_have_continued:
+                missess += 1
+            avg_proximity += game.handValue(Players.DEALER) - 21
+        avg_proximity /= 100
+        print(f"missess: {missess}, busts: {busts}, avg proximity: {avg_proximity}")
+        return busts, missess, avg_proximity
+
+
+    def test_ai_dealer_AG(self):
+        # Create a game state
+        # Set the dealer's hand to a specific value
+        busts, missess, avg_proximity = self.dealer(AIMODE.AGGRESSIVE)
+        self.assertLessEqual(missess, 80)
+
+    def test_ai_dealer_CO(self):
+        busts, missess, avg_proximity = self.dealer(AIMODE.CONSERVATIVE)
+        self.assertLessEqual(busts, 10)
+
 
 
 if __name__ == '__main__':

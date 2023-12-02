@@ -32,6 +32,11 @@ def DealCard(game) -> Tuple[str, int]: # O(1)
     """
     # also add to the seen cards
     card = game.deck.pop(0)
+    dinpos = {"A": 0, "J": 10, "Q": 11, "K": 12}
+    if card[0] in dinpos:
+        game.deck_index[dinpos[card[0]]] -= 1
+    else:
+        game.deck_index[int(card[0]) - 1] -= 1
     game.seen_cards.add(card)
     return card
 

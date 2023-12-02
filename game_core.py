@@ -1,5 +1,5 @@
 from game_util import CalculateHandValue as CalculateHandValueR
-from game_util import GetIdealCards, ProbabilityOfCard
+from game_util import GetIdealCards, ProbabilityOfCard, ProbabilityOfCardValue
 
 def CalculateHandValue(hand : list) -> int: # O(n)
 
@@ -14,18 +14,84 @@ def CalculateHandValue(hand : list) -> int: # O(n)
 
 
 
-def DealerAI(game) -> bool:
+class Node:
+    def __init__(self, value):
+        self.value = value
+        self.children = []
+
+
+def build_tree(node, deck_index, threshold=17):
+    """Build the decision tree.
+    We map out the possible outcomes of the game.
+    """
+    if node.value >= threshold or node.value > 21:
+        return
+    for card_value in range(1, 14):
+        if deck_index[card_value - 1] > 0:
+            new_deck_index = deck_index.copy()
+            new_deck_index[card_value - 1] -= 1  # remove the card from the deck index
+            if card_value == 1:  # if the card is an Ace
+                for ace_value in [1, 11]:
+                    new_value = node.value + ace_value  # calculate the new hand value
+                    child = Node(new_value)
+                    node.children.append(child)
+                    build_tree(child, new_deck_index, threshold)
+            else:
+                new_value = node.value + min(card_value, 10)  # calculate the new hand value
+                child = Node(new_value)
+                node.children.append(child)
+                build_tree(child, new_deck_index, threshold)
+
+
+
+def find_good_paths(node, path=[]):
+    if node.value > 21:
+        return []
+    if not node.children:
+        return [path]
+    paths = []
+    for child in node.children:
+        paths += find_good_paths(child, path + [child.value])
+    return paths
+
+def all_paths_count(node, path=[]):
+    if not node.children:
+        return 1
+    count = 0
+    for child in node.children:
+        count += all_paths_count(child, path + [child.value])
+    return count
+
+
+def DealerAI(game):
     from game_state import Players
 
-    # Create a dictionary to keep track of the count of each card in the deck
-    card_counts = {card: game.deck.count(card) for card in game.deck}
+    # Get the dealer's hand value
+    dealer_hand_value = game.handValue(Players.DEALER)
 
-    # change this into a tree
-    max_card_value = 21 - game.handValue(Players.DEALER)
-    favorable_outcomes = sum(count for card, count in card_counts.items()
-                             if CalculateHandValue([card]) <= max_card_value)
+    # Build the decision tree
+    root = Node(dealer_hand_value)
+    build_tree(root, game.deck_index)
 
-    total_cards = len(game.deck)
-    probability = favorable_outcomes / total_cards
-    return probability > 0.5
 
+    paths = find_good_paths(root)
+    paths = [path for path in paths if len(path) > 1]
+    if len(paths) == 0:
+        return False
+    pthlen = all_paths_count(root)
+    good_paths_ratio = len(paths) / pthlen
+
+    # now just gotta get the odds of next card falling into the good paths
+    next_card_odds = 0
+    for path in paths:
+        next_card_odds += ProbabilityOfCardValue(abs(dealer_hand_value - path[0]), game)
+
+    next_card_odds /= len(paths)
+
+    from game_state import AIMODE # avoid circular import
+    if game.AI_MODE == AIMODE.CONSERVATIVE:
+        return (next_card_odds * good_paths_ratio) > 0.7
+    elif game.AI_MODE == AIMODE.AGGRESSIVE:
+        return next_card_odds > 0.3
+    else:
+        raise ValueError("Invalid AI mode")

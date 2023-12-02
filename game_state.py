@@ -7,6 +7,10 @@ from parts import DealCard, ShuffleDeck, DealHand, PrettyPrintCard
 import enum
 
 
+class AIMODE(enum.Enum):
+    AGGRESSIVE = 0
+    CONSERVATIVE = 1
+
 class Players(enum.Enum):
     DEALER = 0
     PLAYER = 1
@@ -14,12 +18,25 @@ class Players(enum.Enum):
 
 class GameState:
 
-    def __init__(self):
+    def __init__(self, mode=AIMODE.CONSERVATIVE):
         self.deck = ShuffleDeck(GenerateCards())
+        self.deck_index = self.secondary_deck_representation()
         self.seen_cards = set()
         (self.dealer_hand,
          self.player_hand) = DealHand(self), DealHand(self)
+        self.AI_MODE = mode
         self.seen_cards.remove(self.dealer_hand[0])
+
+    def secondary_deck_representation(self):
+        # index based representation of the deck
+        # each pos has count of cards
+        return [4] * 13
+
+    def copy(self):
+        game = GameState()
+        game.deck = self.deck.copy()
+        game.seen_cards = self.seen_cards.copy()
+        return game
 
     def dealCard(self, player):
         if player == Players.DEALER:

@@ -34,13 +34,16 @@ def CalculateHandValue(hand : tuple) -> int: # O(n) - no loops just recursion ov
 
 
 def GetIdealCards(handValue : int, deck : list):
+    """Get the ideal cards to get to the hand value."""
+
     if deck == [] or deck is None: return []
 
-    heap = []
+    heap = [] # we use a heap to track best
     for card_index, card in enumerate(deck): # better
         card_diff = abs(handValue - CalculateHandValue([card]))
 
-        if len(heap) < 3 or card_diff < heap[0][1]:
+        if len(heap) < 3 or card_diff < heap[0][1]: # make sure
+            # we keep it mem efficient
             if len(heap) == 3:
                 heapq.heappop(heap)
             # TODO
@@ -60,8 +63,27 @@ def ProbabilityOfCard(card: Tuple[str, int], game) -> float:
     if card in game.seen_cards:
         return 0
     # get the number of cards in the deck
-    # TODO count cards in deck with value of card
     return game.deck.count(card) / len(game.deck)
+
+def ProbabilityOfCardValue(value: int, game) -> float:
+
+    """Calculate the probability of a cards value (ignore suit) for non seen cards.
+    Args:
+        card (tuple): card
+    Returns:
+        float: probability of the card
+    """
+    # check if the card is in the seen cards
+    dinpos = {"A": 0, "J": 10, "Q": 11, "K": 12}
+    if value in dinpos:
+        value = dinpos[value]
+    else:
+        value -= 1
+    # get the number of cards in the deck
+    specific = game.deck_index[value] / sum(game.deck_index)
+    orless = sum(game.deck_index[value:]) / sum(game.deck_index)
+    return sum([specific, orless]) / 2
+
 
 
 def GenerateCards() -> list:
@@ -74,3 +96,5 @@ def GenerateCards() -> list:
     return [(value, suit) for suit in ['S', 'H', 'D', 'C'] for value in range(2, 11)] + [(value, suit) for suit in
                                                                                   ['S', 'H', 'D', 'C'] for value in
                                                                                   ['J', 'Q', 'K', 'A']]
+
+
