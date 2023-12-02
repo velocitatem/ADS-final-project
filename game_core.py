@@ -64,7 +64,11 @@ def all_paths_count(node, path=[]):
 
 
 def DealerAI(game):
-    from game_state import Players
+    from game_state import Players, AIMODE # dep loop
+    if game.AI_MODE == AIMODE.NEURAL:
+        # load a .dot file
+        pass
+
 
     # Get the dealer's hand value
     dealer_hand_value = game.handValue(Players.DEALER)
@@ -88,7 +92,6 @@ def DealerAI(game):
 
     next_card_odds /= len(paths)
 
-    from game_state import AIMODE # avoid circular import
     if game.AI_MODE == AIMODE.CONSERVATIVE:
         return (next_card_odds * good_paths_ratio) > 0.7
     elif game.AI_MODE == AIMODE.AGGRESSIVE:

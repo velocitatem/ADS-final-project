@@ -10,6 +10,7 @@ import enum
 class AIMODE(enum.Enum):
     AGGRESSIVE = 0
     CONSERVATIVE = 1
+    NEURAL = 2
 
 class Players(enum.Enum):
     DEALER = 0
@@ -57,16 +58,16 @@ class GameState:
             if player == Players.DEALER \
             else self._playerHandValue()
 
-    def prettyPrint(self):
+    def prettyPrint(self, show_house_card=True):
         print("Dealer's hand: ")
-        for card in self.dealer_hand:
+        for card in self.dealer_hand if show_house_card else self.dealer_hand[1:]:
             PrettyPrintCard(card)
         print()
         print("Player's hand: ")
         for card in self.player_hand:
             PrettyPrintCard(card)
         print()
-        print("Dealer's hand value: ", self._dealerHandValue())
+        print("Dealer's hand value: ", self._dealerHandValue() if show_house_card else "??")
         print("Player's hand value: ", self._playerHandValue())
         print()
 
