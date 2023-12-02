@@ -31,7 +31,7 @@ def DealCard(game) -> Tuple[str, int]: # O(1)
         tuple: card
     """
     # also add to the seen cards
-    card = game.deck.pop()
+    card = game.deck.pop(0)
     game.seen_cards.add(card)
     return card
 
@@ -57,10 +57,9 @@ def PrettyPrintCard(card: Tuple[str, int]) -> str: # O(1)
     """
     # S = S, ♥ = H, ♦ = D, ♣ = C
     symbol = {
-        'S': '♠',
-        'H': '♥',
-        'D': '♦',
-        'C': '♣',
+        'S': 'Spades', # '♠
+        'H': 'Hearts', # '♥
+        'D': 'Diamonds', # '♦
+        'C': 'Clubs', # '♣
     }
-    # TODO Make a verbose function that gives use the full name of the card
-    print(f'{symbol[card[1]]} {card[0]}')
+    print(f"{card[0]} of {symbol[card[1]]}")

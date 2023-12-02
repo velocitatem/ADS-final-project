@@ -13,28 +13,19 @@ def CalculateHandValue(hand : list) -> int: # O(n)
     return CalculateHandValueR(tuple(hand))
 
 
+
 def DealerAI(game) -> bool:
-
-    """A Simple algorithm to determine if the dealer should hit or stand.
-    Args:
-        game (GameState): game state
-    Returns:
-        bool: True = hit, False = stand
-    This algorithm is a card-counter algorithm, based on the predicted probability it will hit or stand.
-    """
-
     from game_state import Players
-    # using cached valur
-    left = 21 - game.handValue(Players.DEALER)
-    ideal = GetIdealCards(game.handValue(Players.DEALER), game.deck)
-    print(ideal)
-    # we need to check the probability of the card
-    while ideal:
-        card = ideal.pop()
-        card_probability = ProbabilityOfCard(card[0])
-        if card[1] <= left and card_probability > 0:
-            print("Dealer hits")
-            return True
-        else:
-            print("Dealer stands")
-            return False
+
+    # Create a dictionary to keep track of the count of each card in the deck
+    card_counts = {card: game.deck.count(card) for card in game.deck}
+
+    # change this into a tree
+    max_card_value = 21 - game.handValue(Players.DEALER)
+    favorable_outcomes = sum(count for card, count in card_counts.items()
+                             if CalculateHandValue([card]) <= max_card_value)
+
+    total_cards = len(game.deck)
+    probability = favorable_outcomes / total_cards
+    return probability > 0.5
+

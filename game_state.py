@@ -1,5 +1,7 @@
 import enum
-from game_core import CalculateHandValue
+
+import parts
+from game_core import CalculateHandValue, DealerAI
 from game_util import GenerateCards
 from parts import DealCard, ShuffleDeck, DealHand, PrettyPrintCard
 import enum
@@ -39,11 +41,11 @@ class GameState:
             else self._playerHandValue()
 
     def prettyPrint(self):
-        print("Dealer's hand: ", end="")
+        print("Dealer's hand: ")
         for card in self.dealer_hand:
             PrettyPrintCard(card)
         print()
-        print("Player's hand: ", end="")
+        print("Player's hand: ")
         for card in self.player_hand:
             PrettyPrintCard(card)
         print()
@@ -51,6 +53,11 @@ class GameState:
         print("Player's hand value: ", self._playerHandValue())
         print()
 
+    def getPrintMatrix(self):
+        return [
+            [parts.PrettyPrintCard(card) for card in self.dealer_hand],
+            [parts.PrettyPrintCard(card) for card in self.player_hand],
+        ]
     def winner(self) -> Players or None:
 
         """Select the winner. Returns None if there is no winner.
@@ -80,4 +87,5 @@ class GameState:
         return self._dealerHandValue() == self._playerHandValue()
 
     def dealerChoice(self) -> bool:
-        return self._dealerHandValue() < 17
+        # use DealerAI
+        return DealerAI(self)
