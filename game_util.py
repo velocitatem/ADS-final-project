@@ -4,7 +4,7 @@ import heapq
 
 
 @lru_cache(maxsize=128)
-def CalculateHandValue(hand : tuple) -> int: # O(n) - no loops just recursion over the list
+def CalculateHandValue(hand : tuple) -> int: # O(n) - no loops just recursion over the list + memoization
 
     """Calculate the value of the hand.
     Args:
@@ -33,23 +33,6 @@ def CalculateHandValue(hand : tuple) -> int: # O(n) - no loops just recursion ov
         return hand[0][0] + CalculateHandValue(hand[1:])
 
 
-def GetIdealCards(handValue : int, deck : list):
-    """Get the ideal cards to get to the hand value."""
-
-    if deck == [] or deck is None: return []
-
-    heap = [] # we use a heap to track best
-    for card_index, card in enumerate(deck): # better
-        card_diff = abs(handValue - CalculateHandValue([card]))
-
-        if len(heap) < 3 or card_diff < heap[0][1]: # make sure
-            # we keep it mem efficient
-            if len(heap) == 3:
-                heapq.heappop(heap)
-            # TODO
-            heapq.heappush(heap, (card_diff, card_index))
-
-    return [(deck[i[1]], i[0]) for i in heap]
 
 def ProbabilityOfCard(card: Tuple[str, int], game) -> float:
 

@@ -1,5 +1,5 @@
 from game_util import CalculateHandValue as CalculateHandValueR
-from game_util import GetIdealCards, ProbabilityOfCard, ProbabilityOfCardValue
+from game_util import ProbabilityOfCard, ProbabilityOfCardValue
 
 def CalculateHandValue(hand : list) -> int: # O(n)
 
@@ -26,7 +26,7 @@ def build_tree(node, deck_index, threshold=17):
     """
     if node.value >= threshold or node.value > 21:
         return
-    for card_value in range(1, 14):
+    for card_value in range(1, 14): # 1 to 13
         if deck_index[card_value - 1] > 0:
             new_deck_index = deck_index.copy()
             new_deck_index[card_value - 1] -= 1  # remove the card from the deck index
@@ -63,6 +63,7 @@ def all_paths_count(node, path=[]):
     return count
 
 
+
 def DealerAI(game):
     from game_state import Players, AIMODE # dep loop
     if game.AI_MODE == AIMODE.NEURAL:
@@ -80,6 +81,10 @@ def DealerAI(game):
 
     paths = find_good_paths(root)
     paths = [path for path in paths if len(path) > 1]
+
+
+
+
     if len(paths) == 0:
         return False
     pthlen = all_paths_count(root)
@@ -91,6 +96,8 @@ def DealerAI(game):
         next_card_odds += ProbabilityOfCardValue(abs(dealer_hand_value - path[0]), game)
 
     next_card_odds /= len(paths)
+
+
 
     hit = (next_card_odds * good_paths_ratio) > 0.4
     if game.AI_MODE == AIMODE.CONSERVATIVE:

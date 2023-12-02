@@ -8,11 +8,11 @@ from colorama import Fore, Style, init
 
 init(autoreset=True)
 
-def main_cli():
+def main_cli(mode):
     print(Fore.GREEN + "Welcome to BlackJack Game!")
     print("Rules: Try to get as close to 21 as you can without going over!\nDealer hits until she reaches 17. Aces count as 1 or 11.")
 
-    game = GameState()
+    game = GameState(mode=mode)
     game.prettyPrint(show_house_card=False)
 
     turn = Players.PLAYER
@@ -46,10 +46,17 @@ def main_cli():
     print(Fore.GREEN + "\nThank you for playing BlackJack! See you next time.")
 
 if __name__ == '__main__':
-    # use argparse to parse the command line arguments
-    # let the user select what mode to play in
-    # --mode [aggressive, conservative]
-    # also give a help message where we explain the modes and the game
-    # add a --gui flag to play in gui mode (experimental)
-    # argparse:...
-    main_cli()
+    import argparse
+    parser = argparse.ArgumentParser(description="BlackJack via Algorithm")
+    parser.add_argument('--mode', choices=['aggressive', 'conservative'],
+                        default='aggressive', help='Choose a mode for the dealer AI')
+    args = parser.parse_args()
+    if args.mode == 'aggressive':
+        from game_state import AIMODE
+        AIMODE = AIMODE.AGGRESSIVE
+    elif args.mode == 'conservative':
+        from game_state import AIMODE
+        AIMODE = AIMODE.CONSERVATIVE
+    else:
+        raise ValueError("Invalid mode")
+    main_cli(mode=AIMODE)
