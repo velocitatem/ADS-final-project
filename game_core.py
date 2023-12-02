@@ -92,9 +92,11 @@ def DealerAI(game):
 
     next_card_odds /= len(paths)
 
+    hit = (next_card_odds * good_paths_ratio) > 0.4
     if game.AI_MODE == AIMODE.CONSERVATIVE:
-        return (next_card_odds * good_paths_ratio) > 0.7
+        return next_card_odds > 0.4 and good_paths_ratio > 0.5
     elif game.AI_MODE == AIMODE.AGGRESSIVE:
-        return next_card_odds > 0.3
+        return next_card_odds > 0.5
     else:
         raise ValueError("Invalid AI mode")
+

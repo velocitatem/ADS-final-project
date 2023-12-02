@@ -19,7 +19,7 @@ class Players(enum.Enum):
 
 class GameState:
 
-    def __init__(self, mode=AIMODE.CONSERVATIVE):
+    def __init__(self, mode=AIMODE.AGGRESSIVE):
         self.deck = ShuffleDeck(GenerateCards())
         self.deck_index = self.secondary_deck_representation()
         self.seen_cards = set()

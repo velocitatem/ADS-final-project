@@ -3,14 +3,17 @@ A black-jack implementation in Python.
 Using:
 + Pygame
 """
-import pygame
 from game_state import GameState, Players
+from colorama import Fore, Style, init
+
+init(autoreset=True)
 
 def main_cli():
+    print(Fore.GREEN + "Welcome to BlackJack Game!")
+    print("Rules: Try to get as close to 21 as you can without going over!\nDealer hits until she reaches 17. Aces count as 1 or 11.")
 
     game = GameState()
     game.prettyPrint(show_house_card=False)
-
 
     turn = Players.PLAYER
     stood_status = {
@@ -20,28 +23,27 @@ def main_cli():
     while True:
         if stood_status[Players.PLAYER] and stood_status[Players.DEALER]:
             break
-        # making this relatively branchless
-        print(f"{turn.name}'s turn")
+        print(Fore.YELLOW + f"\n{turn.name}'s turn")
         hit = input("Hit or Stand? (h/s): ").lower() == "h" if turn == Players.PLAYER else game.dealerChoice()
         print(f"{turn.name} {'hits' if hit else 'stands'}")
         if hit:
             game.dealCard(turn)
             game.prettyPrint()
             if game.handValue(turn) > 21:
-                print(f"{turn.name} busts!")
+                print(Fore.RED + f"{turn.name} busts!")
                 break
         else:
             stood_status[turn] = True
             turn = Players.DEALER if turn == Players.PLAYER else Players.PLAYER
             continue
 
-    #  check for winner
     winner = game.winner()
     if winner is None:
-        print("Draw!")
+        print(Fore.CYAN + "\nDraw!")
     else:
-        print(f"{winner.name} wins!")
+        print(Fore.GREEN + f"\n{winner.name} wins!")
 
+    print(Fore.GREEN + "\nThank you for playing BlackJack! See you next time.")
 
 if __name__ == '__main__':
     # use argparse to parse the command line arguments
