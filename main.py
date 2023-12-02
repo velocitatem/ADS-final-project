@@ -44,4 +44,10 @@ def main_cli():
 
 
 if __name__ == '__main__':
+    # use argparse to parse the command line arguments
+    # let the user select what mode to play in
+    # --mode [aggressive, conservative]
+    # also give a help message where we explain the modes and the game
+    # add a --gui flag to play in gui mode (experimental)
+    # argparse:...
     main_cli()

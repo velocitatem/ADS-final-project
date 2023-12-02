@@ -26,6 +26,7 @@ class GameState:
         (self.dealer_hand,
          self.player_hand) = DealHand(self), DealHand(self)
         self.AI_MODE = mode
+        print("MODE: ", self.AI_MODE.name)
         self.seen_cards.remove(self.dealer_hand[0])
 
     def secondary_deck_representation(self):
@@ -35,6 +36,7 @@ class GameState:
 
     def copy(self):
         game = GameState()
+        game.AI_MODE = self.AI_MODE
         game.deck = self.deck.copy()
         game.seen_cards = self.seen_cards.copy()
         return game

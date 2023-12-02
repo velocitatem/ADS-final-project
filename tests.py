@@ -40,12 +40,15 @@ class BlackJack(ut.TestCase):
         busts = 0
         # simulate games, dealer should not bust
         for case in range(100):
-            game = GameState(mode)
+            game = GameState(mode=mode)
             # dealt by default
             # play until dealer stands
             # compare dealer choice to reality
             # if dealer stands, dealer should not bust
+            k = 0
             while DealerAI(game.copy()):
+                print("dealer hit", k)
+                k+=1
                 game.dealCard(Players.DEALER)
             # see if dealer chould have gone farther
             if game.handValue(Players.DEALER) > 21:
