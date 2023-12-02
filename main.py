@@ -9,7 +9,7 @@ from game_state import GameState, Players
 def main_cli():
 
     game = GameState()
-    game.prettyPrint()
+    game.prettyPrint(show_house_card=False)
 
 
     turn = Players.PLAYER
