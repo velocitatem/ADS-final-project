@@ -20,7 +20,7 @@ class Node:
         self.children = []
 
 
-def build_tree(node, deck_index, threshold=17):
+def build_tree(node, deck_index, threshold=17): #TODO explain why we use 17 - its in the rules
     """Build the decision tree.
     We map out the possible outcomes of the game.
     """
@@ -99,9 +99,8 @@ def DealerAI(game):
 
 
 
-    hit = (next_card_odds * good_paths_ratio) > 0.4
     if game.AI_MODE == AIMODE.CONSERVATIVE:
-        return next_card_odds > 0.4 and good_paths_ratio > 0.5
+        return next_card_odds > 0.6 and good_paths_ratio > 0.5
     elif game.AI_MODE == AIMODE.AGGRESSIVE:
         return next_card_odds > 0.5
     else:
