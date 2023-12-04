@@ -21,7 +21,7 @@ class Node:
 
 
 DEPTH_LIMIT = 5
-def build_tree(node, deck_index, threshold=17, depth=0): #TODO explain why we use 17 - its in the rules
+def build_tree(node, deck_index, threshold=21, depth=0): #TODO explain why we use 17 - its in the rules
     """Build the decision tree.
     We map out the possible outcomes of the game.
     Root node is the dealer's hand value.
@@ -29,11 +29,11 @@ def build_tree(node, deck_index, threshold=17, depth=0): #TODO explain why we us
         |- Children's children are poss hand values after the player hits.
             |- ...
     """
-    if node.value >= threshold or node.value > 21 or depth >= DEPTH_LIMIT:
+    if node.value >= threshold or depth >= DEPTH_LIMIT:
         return
+    new_deck_index = deck_index.copy()
     for card_value in range(1, 14): # 1 to 13
         if deck_index[card_value - 1] > 0:
-            new_deck_index = deck_index.copy()
             new_deck_index[card_value - 1] -= 1  # remove the card from the deck index
             if card_value == 1:  # if the card is an Ace
                 for ace_value in [1, 11]:
@@ -106,21 +106,18 @@ def DealerAI(game):
     paths = find_good_paths(root)
     paths = [path for path in paths if len(path) > 1]
 
-
-
-
     if len(paths) == 0:
         return False
     pthlen = all_paths_count(root)
     good_paths_ratio = len(paths) / pthlen
 
-    # now just gotta get the odds of next card falling into the good paths
-    next_card_odds = 0
-    for path in paths:
-        next_card_odds += ProbabilityOfCardValue(abs(dealer_hand_value - path[0]), game)
+    # highest card we need to hit first
+    highest_card = max([path[0] for path in paths])
+    highest_card = abs(dealer_hand_value - highest_card)
+    next_card_odds = ProbabilityOfCardValue(highest_card, game)
 
-    next_card_odds /= len(paths)
-    print("next card odds", next_card_odds)
+
+
 
 
 

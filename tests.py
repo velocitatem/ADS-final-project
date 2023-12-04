@@ -47,7 +47,6 @@ class BlackJack(ut.TestCase):
             # if dealer stands, dealer should not bust
             k = 0
             while DealerAI(game.copy()):
-                print("dealer hit", k)
                 k+=1
                 game.dealCard(Players.DEALER)
             # see if dealer chould have gone farther
