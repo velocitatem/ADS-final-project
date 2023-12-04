@@ -12,6 +12,8 @@ def ShuffleDeck(deck: list) -> list: # O(n)
     """
     # this algorithm is called Fisher-Yates shuffle
     # https://en.wikipedia.org/wiki/Fisher%E2%80%93Yates_shuffle
+    # !! we did not learn this in class but having done online research !!
+    # it came up as the most efficient way to shuffle a deck
 
     n = len(deck)
     while n > 1: # O(n)
@@ -31,12 +33,13 @@ def DealCard(game) -> Tuple[str, int]: # O(1)
         tuple: card
     """
     # also add to the seen cards
-    card = game.deck.popleft()
+    card = game.deck.popleft() # pop the first card
     dinpos = {"A": 0, "J": 10, "Q": 11, "K": 12}
     if card[0] in dinpos:
-        game.deck_index[dinpos[card[0]]] -= 1
+        game.deck_index[dinpos[card[0]]] -= 1 # we just decrement the index
     else:
         game.deck_index[int(card[0]) - 1] -= 1
+    # make sure we keep track in a set
     game.seen_cards.add(card)
     return card
 

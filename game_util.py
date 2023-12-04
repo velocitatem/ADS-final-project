@@ -22,16 +22,17 @@ def CalculateHandValue(hand : tuple) -> int: # O(n) - no loops just recursion ov
     }
     if hand == ():
         return 0
-    if hand[0][0] in legend:
-        handFilter = legend[hand[0][0]]
-        if callable(handFilter): # check callable for A
-            # pylint: disable=line-too-long
+    if hand[0][0] in legend: # check if the card is in the legend (i.e. JQKA)
+        # we check first hand [0] and then the first element of the tuple [0] (i.e. the value)
+        handFilter = legend[hand[0][0]] # get the value of the card
+        if callable(handFilter): # check callable for A (i.e. ace)
+            # we decide if we use a soft ace or a hard ace 1 or 11
             return handFilter(CalculateHandValue(hand[1:])) + CalculateHandValue(hand[1:])
+            # if we can have a soft-ace, we need to add the value of the hand without the ace
         else:
-            return handFilter + CalculateHandValue(hand[1:])
+            return handFilter + CalculateHandValue(hand[1:]) # if we have a JQK, we just add the value
     else:
-        return hand[0][0] + CalculateHandValue(hand[1:])
-
+        return hand[0][0] + CalculateHandValue(hand[1:]) # if we have a number, we just add the value and recurse
 
 
 def ProbabilityOfCard(card: Tuple[str, int], game) -> float:
@@ -43,10 +44,10 @@ def ProbabilityOfCard(card: Tuple[str, int], game) -> float:
         float: probability of the card
     """
     # check if the card is in the seen cards
-    if card in game.seen_cards:
-        return 0
     # get the number of cards in the deck
-    return game.deck.count(card) / len(game.deck)
+    return game.deck.count(card) / len(game.deck) \
+        if card not in game.seen_cards \
+    else 0
 
 def ProbabilityOfCardValue(value: int, game) -> float: # O(13) # deck indices are constant
     # we just sum over the index (more optimal)
@@ -59,6 +60,7 @@ def ProbabilityOfCardValue(value: int, game) -> float: # O(13) # deck indices ar
     """
     # check if the card is in the seen cards
     dinpos = {"A": 0, "J": 10, "Q": 11, "K": 12}
+    # dinpos stands for "deck index number position"
     if value in dinpos:
         value = dinpos[value]
     else:
@@ -67,11 +69,8 @@ def ProbabilityOfCardValue(value: int, game) -> float: # O(13) # deck indices ar
     # value is index, we have num cards at that index left
     # we just sum over the index (that value or smaller)
     ocos = sum(game.deck_index[:value + 1])
+    # ocos stands for "occurences of card of size"
     return ocos / sum(game.deck_index)
-
-
-
-
 
 
 def GenerateCards() -> list: # O(1)
@@ -81,11 +80,8 @@ def GenerateCards() -> list: # O(1)
         list: list of cards
     """
     # this is an array, but we use it as a queue
-    q = [(value, suit) for suit in ['S', 'H', 'D', 'C'] for value in range(2, 11)] + [(value, suit) for suit in
+    # at first we use an array because we need to shuffle it
+    # queue is crated in game_state __init__
+    return [(value, suit) for suit in ['S', 'H', 'D', 'C'] for value in range(2, 11)] + [(value, suit) for suit in
                                                                                   ['S', 'H', 'D', 'C'] for value in
                                                                                   ['J', 'Q', 'K', 'A']]
-
-    return q
-
-
-

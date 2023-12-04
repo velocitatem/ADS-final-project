@@ -1,3 +1,2 @@
 pygame==2.5.2
-pygame_cards
-colorama
+colorama==0.4.6

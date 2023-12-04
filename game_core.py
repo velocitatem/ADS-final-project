@@ -1,17 +1,17 @@
 from game_util import CalculateHandValue as CalculateHandValueR
 from game_util import ProbabilityOfCard, ProbabilityOfCardValue
 
+
 def CalculateHandValue(hand : list) -> int: # O(n)
 
     """Calculate the value of the hand.
     Args:
         hand (list): list of cards [where a card is a tuple of (suit, value)]
-    Returns:
+    Retu 0.4.6 rns:
         int: value of the hand
     This is a simple adapter function that converts the list to a tuple.
     """
     return CalculateHandValueR(tuple(hand))
-
 
 
 class Node:
@@ -21,13 +21,16 @@ class Node:
 
 
 DEPTH_LIMIT = 5
-def build_tree(node, deck_index, threshold=21, depth=0): #TODO explain why we use 17 - its in the rules
+
+
+def build_tree(node, deck_index, threshold=21, depth=0): # O(13^5) WORST CASE
     """Build the decision tree.
     We map out the possible outcomes of the game.
     Root node is the dealer's hand value.
-    |- Children are poss hand values after the dealer hits.
-        |- Children's children are poss hand values after the player hits.
-            |- ...
+    |- Children are poss hand values after the dealer hits again
+        |- Children's children are poss hand values after the dealer hits again.
+            |- ... until the threshold is reached or the depth limit is reached. The threshold is 21
+            21 is the maximum anyone could get (in order to win)
     """
     if node.value >= threshold or depth >= DEPTH_LIMIT:
         return
@@ -37,6 +40,8 @@ def build_tree(node, deck_index, threshold=21, depth=0): #TODO explain why we us
             new_deck_index[card_value - 1] -= 1  # remove the card from the deck index
             if card_value == 1:  # if the card is an Ace
                 for ace_value in [1, 11]:
+                    # an ace can hold 2 values, 1 or 11 (depending on the hand)
+                    # we have to consider both cases
                     new_value = node.value + ace_value  # calculate the new hand value
                     child = Node(new_value)
                     node.children.append(child)
@@ -48,7 +53,6 @@ def build_tree(node, deck_index, threshold=21, depth=0): #TODO explain why we us
                 build_tree(child, new_deck_index, threshold, depth + 1)
 
 
-
 def find_good_paths(node, path=[]):
 
     """Find the paths that are "good" (i.e. the dealer should hit).
@@ -56,21 +60,25 @@ def find_good_paths(node, path=[]):
         node (Node): the node to start from
         path (list): the current path
     Returns:
-        list: list of paths
+        list: list of pathDEALERs
     """
-    if node.value > 21:
+    if node.value > 21: # we have not busted but its the end of the path (we have to stop)
         return []
     if not node.children:
-        return [path]
+        return [path] # recursive base case
     paths = []
     for child in node.children:
+        # build the paths
         paths += find_good_paths(child, path + [child.value])
-    return paths
+    return paths # return the paths
+
 
 def all_paths_count(node, path=[]):
 
     """
     Returns the number of all paths in the tree.
+    The same as the method above but we just count the paths instead of returning them.
+    ALL not just good paths
     """
     if not node.children:
         return 1
@@ -78,7 +86,6 @@ def all_paths_count(node, path=[]):
     for child in node.children:
         count += all_paths_count(child, path + [child.value])
     return count
-
 
 
 def DealerAI(game):
@@ -90,26 +97,24 @@ def DealerAI(game):
         bool: True if the dealer should hit, False if the dealer should stand
     """
     from game_state import Players, AIMODE # dep loop
-    if game.AI_MODE == AIMODE.NEURAL:
-        # load a .dot file
+    if game.AI_MODE == AIMODE.NEURAL: # load a .dot file
         pass
 
-
-    # Get the dealer's hand value
-    dealer_hand_value = game.handValue(Players.DEALER)
-
-    # Build the decision tree
+    dealer_hand_value = game.handValue(Players.DEALER) # Get the dealer's hand value
     root = Node(dealer_hand_value)
+    # Build the decision tree
     build_tree(root, game.deck_index)
 
-
-    paths = find_good_paths(root)
-    paths = [path for path in paths if len(path) > 1]
+    paths = find_good_paths(root) # Find the good paths
+    paths = [path for path in paths if len(path) > 0]
+    # this was where we had a 1 instead of a 0
+    # issue was we were forgetting paths that could win in 1 HIT
 
     if len(paths) == 0:
         return False
     pthlen = all_paths_count(root)
     good_paths_ratio = len(paths) / pthlen
+    # used for further probability eval with conservative mode
 
     # highest card we need to hit first
     highest_card = max([path[0] for path in paths])
@@ -117,14 +122,15 @@ def DealerAI(game):
     highest_card = abs(dealer_hand_value - highest_card) # since its just the state representation of the hand value
     # we diff the stuff
     next_card_odds = ProbabilityOfCardValue(highest_card, game)
+    print(next_card_odds)
     # then we look at the probability of getting that card or lower
-    # this gives use the odds that we wont bust so to say
-
-
+    # this gives use the odds that we won't bust so to say
     if game.AI_MODE == AIMODE.CONSERVATIVE:
         return next_card_odds > 0.6 and good_paths_ratio > 0.5
+        # here we want the dealer to always play it very safe
     elif game.AI_MODE == AIMODE.AGGRESSIVE:
         return next_card_odds > 0.5
+        # here we want the dealer to play it safe but not too safe
     else:
         raise ValueError("Invalid AI mode")
 

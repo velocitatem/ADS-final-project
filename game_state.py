@@ -137,6 +137,8 @@ class GameState:
 
         """The dealer's choice."""
         # use DealerAI
-        if self._dealerHandValue() <= 10: # if the dealer has a low hand, hit (always safe to hit)
+        if self._dealerHandValue() <= 10:
+            # if the dealer has a low hand, hit (always safe to hit)
+            # why not use 11? In case of an ace
             return True
         return DealerAI(self)
