@@ -2,7 +2,20 @@
 
 This project is a Python implementation of the popular card game, BlackJack. The game is played in the command line interface and uses a dealer AI to simulate the dealer's decisions during the game. The dealer AI can operate in two modes: aggressive and conservative.
 
+## BlackJack Game -- Rules
+
+1. Each player, & Dealer, is given 2 cards
+2. Players take turns deciding whether to hit or stand 
+3. Players can continue to hit as many times as they want, but if total value of hand > 21 = round lost
+4. Once all players completed a turn, the dealer reveals the hole card
+5. The dealer must hit until their hand totals += 17 (if the dealer busts, all remaining players win)
+6. If the dealer doesn’t bust, the player's hands are compared to the dealer's. The player with a hand value closer to 21 without going over wins
+7. We simplify the rules for a Dealer VS. Player setup
+
+
 ## Key Algorithms and Data Structures
+
+
 
 ### Dealer AI
 
