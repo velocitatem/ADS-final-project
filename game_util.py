@@ -1,6 +1,6 @@
 from functools import lru_cache
 from typing import Tuple
-import heapq
+
 
 
 @lru_cache(maxsize=128)
@@ -48,7 +48,8 @@ def ProbabilityOfCard(card: Tuple[str, int], game) -> float:
     # get the number of cards in the deck
     return game.deck.count(card) / len(game.deck)
 
-def ProbabilityOfCardValue(value: int, game) -> float:
+def ProbabilityOfCardValue(value: int, game) -> float: # O(13) # deck indices are constant
+    # we just sum over the index (more optimal)
 
     """Calculate the probability of a cards value (ignore suit) for non seen cards.
     Args:
@@ -69,15 +70,18 @@ def ProbabilityOfCardValue(value: int, game) -> float:
 
 
 
-def GenerateCards() -> list:
+def GenerateCards() -> list: # O(1)
 
-    """Generates a list of cards.
+    """Generates a deck which acts as a queue.
     Returns:
         list: list of cards
     """
     # this is an array, but we use it as a queue
-    return [(value, suit) for suit in ['S', 'H', 'D', 'C'] for value in range(2, 11)] + [(value, suit) for suit in
+    q = [(value, suit) for suit in ['S', 'H', 'D', 'C'] for value in range(2, 11)] + [(value, suit) for suit in
                                                                                   ['S', 'H', 'D', 'C'] for value in
                                                                                   ['J', 'Q', 'K', 'A']]
+
+    return q
+
 
 

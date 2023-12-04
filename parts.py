@@ -31,7 +31,7 @@ def DealCard(game) -> Tuple[str, int]: # O(1)
         tuple: card
     """
     # also add to the seen cards
-    card = game.deck.pop(0)
+    card = game.deck.popleft()
     dinpos = {"A": 0, "J": 10, "Q": 11, "K": 12}
     if card[0] in dinpos:
         game.deck_index[dinpos[card[0]]] -= 1

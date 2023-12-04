@@ -36,12 +36,16 @@ def main_cli(mode):
             stood_status[turn] = True
             turn = Players.DEALER if turn == Players.PLAYER else Players.PLAYER
             continue
+    print(Fore.YELLOW + "\nFinal hands:")
+    game.prettyPrint()
 
     winner = game.winner()
     if winner is None:
         print(Fore.CYAN + "\nDraw!")
     else:
         print(Fore.GREEN + f"\n{winner.name} wins!")
+
+
 
     print(Fore.GREEN + "\nThank you for playing BlackJack! See you next time.")
 

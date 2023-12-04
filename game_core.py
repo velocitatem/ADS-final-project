@@ -20,11 +20,16 @@ class Node:
         self.children = []
 
 
-def build_tree(node, deck_index, threshold=17): #TODO explain why we use 17 - its in the rules
+DEPTH_LIMIT = 5
+def build_tree(node, deck_index, threshold=17, depth=0): #TODO explain why we use 17 - its in the rules
     """Build the decision tree.
     We map out the possible outcomes of the game.
+    Root node is the dealer's hand value.
+    |- Children are poss hand values after the dealer hits.
+        |- Children's children are poss hand values after the player hits.
+            |- ...
     """
-    if node.value >= threshold or node.value > 21:
+    if node.value >= threshold or node.value > 21 or depth >= DEPTH_LIMIT:
         return
     for card_value in range(1, 14): # 1 to 13
         if deck_index[card_value - 1] > 0:
@@ -35,16 +40,24 @@ def build_tree(node, deck_index, threshold=17): #TODO explain why we use 17 - it
                     new_value = node.value + ace_value  # calculate the new hand value
                     child = Node(new_value)
                     node.children.append(child)
-                    build_tree(child, new_deck_index, threshold)
+                    build_tree(child, new_deck_index, threshold, depth + 1)
             else:
                 new_value = node.value + min(card_value, 10)  # calculate the new hand value
                 child = Node(new_value)
                 node.children.append(child)
-                build_tree(child, new_deck_index, threshold)
+                build_tree(child, new_deck_index, threshold, depth + 1)
 
 
 
 def find_good_paths(node, path=[]):
+
+    """Find the paths that are "good" (i.e. the dealer should hit).
+    Args:
+        node (Node): the node to start from
+        path (list): the current path
+    Returns:
+        list: list of paths
+    """
     if node.value > 21:
         return []
     if not node.children:
@@ -55,6 +68,10 @@ def find_good_paths(node, path=[]):
     return paths
 
 def all_paths_count(node, path=[]):
+
+    """
+    Returns the number of all paths in the tree.
+    """
     if not node.children:
         return 1
     count = 0
@@ -65,6 +82,13 @@ def all_paths_count(node, path=[]):
 
 
 def DealerAI(game):
+
+    """The dealer's AI.
+    Args:
+        game (GameState): the game state
+    Returns:
+        bool: True if the dealer should hit, False if the dealer should stand
+    """
     from game_state import Players, AIMODE # dep loop
     if game.AI_MODE == AIMODE.NEURAL:
         # load a .dot file
@@ -96,6 +120,7 @@ def DealerAI(game):
         next_card_odds += ProbabilityOfCardValue(abs(dealer_hand_value - path[0]), game)
 
     next_card_odds /= len(paths)
+    print("next card odds", next_card_odds)
 
 
 
