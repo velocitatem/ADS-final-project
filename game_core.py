@@ -42,7 +42,7 @@ def build_tree(node, deck_index, threshold=21, depth=0): #TODO explain why we us
                     node.children.append(child)
                     build_tree(child, new_deck_index, threshold, depth + 1)
             else:
-                new_value = node.value + min(card_value, 10)  # calculate the new hand value
+                new_value = node.value + min(card_value, 10) # we use 10 cuz JKQ are all 10 - the max possible
                 child = Node(new_value)
                 node.children.append(child)
                 build_tree(child, new_deck_index, threshold, depth + 1)
@@ -113,12 +113,12 @@ def DealerAI(game):
 
     # highest card we need to hit first
     highest_card = max([path[0] for path in paths])
-    highest_card = abs(dealer_hand_value - highest_card)
+    # we get the highest card that we need to hit
+    highest_card = abs(dealer_hand_value - highest_card) # since its just the state representation of the hand value
+    # we diff the stuff
     next_card_odds = ProbabilityOfCardValue(highest_card, game)
-
-
-
-
+    # then we look at the probability of getting that card or lower
+    # this gives use the odds that we wont bust so to say
 
 
     if game.AI_MODE == AIMODE.CONSERVATIVE:

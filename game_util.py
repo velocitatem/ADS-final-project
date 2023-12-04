@@ -66,9 +66,7 @@ def ProbabilityOfCardValue(value: int, game) -> float: # O(13) # deck indices ar
     # we have say [4, 4, 4, 4] for the deck index
     # value is index, we have num cards at that index left
     # we just sum over the index (that value or smaller)
-    ocos = 0
-    for i in range(value + 1):
-        ocos += game.deck_index[i]
+    ocos = sum(game.deck_index[:value + 1])
     return ocos / sum(game.deck_index)
 
 
