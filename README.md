@@ -1,4 +1,4 @@
-# BlackJack Game
+# BlackJack Game ♠️ ♥️ ♣️ ♦️
 
 This project is a Python implementation of the popular card game, BlackJack. The game is played in the command line interface and uses a dealer AI to simulate the dealer's decisions during the game. The dealer AI can operate in two modes: aggressive and conservative.
 
