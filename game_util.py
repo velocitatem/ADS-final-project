@@ -1,8 +1,10 @@
 from functools import lru_cache
 from typing import Tuple
+from bigonavigator import O
 
 
 
+@O["n"]
 @lru_cache(maxsize=128)
 def CalculateHandValue(hand : tuple) -> int: # O(n) - no loops just recursion over the list + memoization
 
@@ -35,6 +37,7 @@ def CalculateHandValue(hand : tuple) -> int: # O(n) - no loops just recursion ov
         return hand[0][0] + CalculateHandValue(hand[1:]) # if we have a number, we just add the value and recurse
 
 
+@O["n"]
 def ProbabilityOfCard(card: Tuple[str, int], game) -> float:
 
     """Calculate the probability of a cards value (ignore suit) for non seen cards.
@@ -49,6 +52,7 @@ def ProbabilityOfCard(card: Tuple[str, int], game) -> float:
         if card not in game.seen_cards \
     else 0
 
+@O["1"]
 def ProbabilityOfCardValue(value: int, game) -> float: # O(13) # deck indices are constant
     # we just sum over the index (more optimal)
 
@@ -73,6 +77,7 @@ def ProbabilityOfCardValue(value: int, game) -> float: # O(13) # deck indices ar
     return ocos / sum(game.deck_index)
 
 
+@O["1"]
 def GenerateCards() -> list: # O(1)
 
     """Generates a deck which acts as a queue.

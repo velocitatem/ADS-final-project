@@ -6,6 +6,7 @@ from game_util import GenerateCards
 from parts import DealCard, ShuffleDeck, DealHand, PrettyPrintCard
 import enum
 from collections import deque
+from bigonavigator import O
 
 
 class AIMODE(enum.Enum):
@@ -30,12 +31,14 @@ class GameState:
         print("MODE: ", self.AI_MODE.name)
         self.seen_cards.remove(self.dealer_hand[0])
 
+    @O["1"]
     def secondary_deck_representation(self):
 
         # index based representation of the deck
         # each pos has count of cards
         return [4] * 13
 
+    @O["n"]
     def copy(self):
 
         """Copy the game state.
@@ -47,6 +50,7 @@ class GameState:
         game.seen_cards = self.seen_cards.copy()
         return game
 
+    @O["1"]
     def dealCard(self, player):
 
         """Deal a card to a player.
@@ -60,14 +64,17 @@ class GameState:
         else:
             raise ValueError("Invalid player")
 
+    @O["1"]
     def _dealerHandValue(self):
 
         return CalculateHandValue(self.dealer_hand);
 
+    @O["1"]
     def _playerHandValue(self):
 
         return CalculateHandValue(self.player_hand)
 
+    @O["1"]
     def handValue(self, player):
 
         """Get the hand value of a player."""
@@ -75,6 +82,7 @@ class GameState:
             if player == Players.DEALER \
             else self._playerHandValue()
 
+    @O["n"]
     def prettyPrint(self, show_house_card=True):
 
         """Pretty print the game state.
@@ -91,6 +99,7 @@ class GameState:
         print("Player's hand value: ", self._playerHandValue())
         print()
 
+    @O["1"]
     def getPrintMatrix(self):
 
         """Get the pretty print matrix.
@@ -99,6 +108,8 @@ class GameState:
             [parts.PrettyPrintCard(card) for card in self.dealer_hand],
             [parts.PrettyPrintCard(card) for card in self.player_hand],
         ]
+
+    @O["1"]
     def winner(self) -> Players or None:
 
         """Select the winner. Returns None if there is no winner.
@@ -118,21 +129,25 @@ class GameState:
         else:
             return None
 
+    @O["1"]
     def isBust(self, player) -> bool:
 
         """Check if a player is bust."""
         return self.handValue(player) > 20
 
+    @O["1"]
     def isBlackjack(self, player) -> bool:
 
         """Check if a player has blackjack."""
         return self.handValue(player) == 21
 
+    @O["1"]
     def isTie(self) -> bool:
 
         """Check if there is a tie."""
         return self._dealerHandValue() == self._playerHandValue()
 
+    @O["n!"]
     def dealerChoice(self) -> bool:
 
         """The dealer's choice."""

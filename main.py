@@ -5,6 +5,7 @@ Using:
 """
 from game_state import GameState, Players
 from colorama import Fore, Style, init
+from bigonavigator import show_complexity_table
 
 init(autoreset=True)
 
@@ -50,6 +51,7 @@ def main_cli(mode):
     print(Fore.GREEN + "\nThank you for playing BlackJack! See you next time.")
 
 if __name__ == '__main__':
+    show_complexity_table()
     import argparse
     parser = argparse.ArgumentParser(description="BlackJack via Algorithm")
     parser.add_argument('--mode', choices=['aggressive', 'conservative'],

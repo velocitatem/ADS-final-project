@@ -1,8 +1,10 @@
 from game_util import CalculateHandValue as CalculateHandValueR
 from game_util import ProbabilityOfCard, ProbabilityOfCardValue
+from bigonavigator import O
 
 
-def CalculateHandValue(hand : list) -> int: # O(n)
+@O["n"]
+def CalculateHandValue(hand : list) -> int:
 
     """Calculate the value of the hand.
     Args:
@@ -23,7 +25,8 @@ class Node:
 DEPTH_LIMIT = 5
 
 
-def build_tree(node, deck_index, threshold=21, depth=0): # O(13^5) WORST CASE
+@O["n!"]
+def build_tree(node, deck_index, threshold=21, depth=0):
     """Build the decision tree.
     We map out the possible outcomes of the game.
     Root node is the dealer's hand value.
@@ -53,6 +56,7 @@ def build_tree(node, deck_index, threshold=21, depth=0): # O(13^5) WORST CASE
                 build_tree(child, new_deck_index, threshold, depth + 1)
 
 
+@O["n"]
 def find_good_paths(node, path=[]):
 
     """Find the paths that are "good" (i.e. the dealer should hit).
@@ -73,6 +77,7 @@ def find_good_paths(node, path=[]):
     return paths # return the paths
 
 
+@O["n"]
 def all_paths_count(node, path=[]):
 
     """
@@ -88,6 +93,7 @@ def all_paths_count(node, path=[]):
     return count
 
 
+@O["n!"]
 def DealerAI(game):
 
     """The dealer's AI.
@@ -133,4 +139,3 @@ def DealerAI(game):
         # here we want the dealer to play it safe but not too safe
     else:
         raise ValueError("Invalid AI mode")
-
